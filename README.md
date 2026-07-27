@@ -7,13 +7,7 @@
 A game-aware Statcast analysis and Streamlit dashboard for studying<br>
 within-start velocity and pitch-quality changes.
 
-<p>
-  <a href="https://github.com/NeelVadlamudi/pitcher-fatigue-profile/actions/workflows/ci.yml">
-    <img alt="Continuous integration status" src="https://github.com/NeelVadlamudi/pitcher-fatigue-profile/actions/workflows/ci.yml/badge.svg">
-  </a>
-  <img alt="Python 3.11" src="https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white">
-  <img alt="Streamlit application" src="https://img.shields.io/badge/Streamlit-app-FF4B4B?logo=streamlit&logoColor=white">
-</p>
+<p><a href="https://github.com/NeelVadlamudi/pitcher-fatigue-profile/actions/workflows/ci.yml"><img alt="Continuous integration status" src="https://github.com/NeelVadlamudi/pitcher-fatigue-profile/actions/workflows/ci.yml/badge.svg"></a> <img alt="Python 3.11" src="https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white"> <img alt="Streamlit application" src="https://img.shields.io/badge/Streamlit-app-FF4B4B?logo=streamlit&logoColor=white"></p>
 
 <p>
   <a href="#the-30-second-read">The idea</a> ·
