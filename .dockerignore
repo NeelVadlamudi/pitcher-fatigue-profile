@@ -1,0 +1,14 @@
+.git
+.github
+.coverage
+.pytest_cache
+.venv
+__pycache__
+*.egg-info
+*.pyc
+data/raw
+data/processed
+htmlcov
+outputs/models
+outputs/validation
+notebooks/.ipynb_checkpoints

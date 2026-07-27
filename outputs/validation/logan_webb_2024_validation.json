@@ -1,0 +1,94 @@
+{
+  "provenance": {
+    "pitcher_name": "Logan Webb",
+    "pitcher_id": 657277,
+    "season": 2024,
+    "source": "local_cache",
+    "upstream_source": "baseball_savant_via_pybaseball",
+    "cache_path": "data/raw/webb_logan_657277_2024.csv",
+    "cached_at": "2026-07-27T19:45:47+00:00",
+    "rows": 3346
+  },
+  "quality": {
+    "status": "ready",
+    "rows_input": 3346,
+    "rows_clean": 3209,
+    "games": 33,
+    "eligible_starts": 33,
+    "source_as_of": "2024-09-24",
+    "metrics": {
+      "non_regular_rows_removed": 137,
+      "exact_duplicates_removed": 0,
+      "duplicate_pitch_keys_removed": 0,
+      "eligible_start_rate": 1.0,
+      "release_speed_null_rate": 0.0024929884699283265,
+      "pitch_type_null_rate": 0.0024929884699283265,
+      "velocity_coverage": 0.9975070115300717,
+      "spin_rate_coverage": 0.9956372701776254,
+      "extension_coverage": 0.9971953879713307,
+      "horizontal_break_coverage": 0.9975070115300717,
+      "vertical_break_coverage": 0.9975070115300717,
+      "spin_rate_mnar_shift": 0.004991680532445923
+    },
+    "issues": []
+  },
+  "coverage": {
+    "rows": 3200,
+    "games": 33,
+    "pitch_types": 5,
+    "baseline_rows": 3095,
+    "baseline_coverage": 0.9671875,
+    "late_games_80_plus": 33,
+    "velocity_coverage": 1.0,
+    "spin_rate_coverage": 0.998125,
+    "extension_coverage": 0.9996875,
+    "horizontal_break_coverage": 1.0,
+    "vertical_break_coverage": 1.0,
+    "spin_rate_mnar_shift": 0.004991680532445923
+  },
+  "threshold": {
+    "status": "not_reached",
+    "threshold_pitch": null,
+    "threshold_range": null,
+    "drop_threshold_mph": 1.0,
+    "games_analyzed": 33,
+    "reason": "No sustained late-game bucket met both the configured velocity drop and statistical-support criteria."
+  },
+  "arm_stamina_index": {
+    "score": 83.0,
+    "threshold_component": 50.0,
+    "late_retention_component": 18.4,
+    "consistency_component": 14.6,
+    "late_game_mean_delta": -0.773,
+    "late_game_sd": 0.539,
+    "late_games": 32,
+    "components": [
+      "threshold timing",
+      "fastball velocity retention",
+      "between-game consistency"
+    ],
+    "status": "experimental",
+    "caveat": "Experimental. Components: threshold timing, fastball velocity retention, between-game consistency. The formula is not population-calibrated and is not an injury metric."
+  },
+  "model": {
+    "backend": "sklearn_hist_gradient_boosting",
+    "metrics": {
+      "mae": 0.7516249678659225,
+      "mae_ci_lower": 0.708920560603951,
+      "mae_ci_upper": 0.8004981419883053,
+      "rmse": 0.942269445161721,
+      "r2": 0.01992136183844484,
+      "naive_mae": 0.7589857119073147,
+      "mae_improvement_pct": 0.9698132554952592,
+      "train_games": 26,
+      "test_games": 7,
+      "train_pitches": 2459,
+      "test_pitches": 636,
+      "split_strategy": "chronological",
+      "group_cv_folds": 5,
+      "group_cv_mae_mean": 0.7207331944717745,
+      "group_cv_mae_sd": 0.03478348137417041
+    }
+  },
+  "importance_method": "permutation_mae"
+}

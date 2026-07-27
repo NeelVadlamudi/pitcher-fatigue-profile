@@ -1,0 +1,89 @@
+{
+  "provenance": {
+    "pitcher_name": "Synthetic Demonstration Pitcher",
+    "season": 2024,
+    "source": "deterministic_synthetic_demo"
+  },
+  "quality": {
+    "status": "ready",
+    "rows_input": 1661,
+    "rows_clean": 1661,
+    "games": 16,
+    "eligible_starts": 16,
+    "source_as_of": "2024-07-01",
+    "metrics": {
+      "exact_duplicates_removed": 0,
+      "duplicate_pitch_keys_removed": 0,
+      "eligible_start_rate": 1.0,
+      "release_speed_null_rate": 0.0,
+      "pitch_type_null_rate": 0.0,
+      "velocity_coverage": 1.0,
+      "spin_rate_coverage": 0.9957856712823601,
+      "extension_coverage": 1.0,
+      "horizontal_break_coverage": 1.0,
+      "vertical_break_coverage": 1.0,
+      "spin_rate_mnar_shift": -0.00625
+    },
+    "issues": []
+  },
+  "coverage": {
+    "rows": 1661,
+    "games": 16,
+    "pitch_types": 4,
+    "baseline_rows": 1661,
+    "baseline_coverage": 1.0,
+    "late_games_80_plus": 16,
+    "velocity_coverage": 1.0,
+    "spin_rate_coverage": 0.9957856712823601,
+    "extension_coverage": 1.0,
+    "horizontal_break_coverage": 1.0,
+    "vertical_break_coverage": 1.0,
+    "spin_rate_mnar_shift": -0.00625
+  },
+  "threshold": {
+    "status": "established",
+    "threshold_pitch": 91,
+    "threshold_range": "91\u2013100",
+    "drop_threshold_mph": 1.0,
+    "games_analyzed": 16,
+    "reason": "First sustained bucket meeting the velocity-drop, uncertainty, sample-size, and coverage criteria."
+  },
+  "arm_stamina_index": {
+    "score": 70.3,
+    "threshold_component": 37.9,
+    "late_retention_component": 14.0,
+    "consistency_component": 18.4,
+    "late_game_mean_delta": -1.069,
+    "late_game_sd": 0.163,
+    "late_games": 16,
+    "components": [
+      "threshold timing",
+      "fastball velocity retention",
+      "between-game consistency"
+    ],
+    "status": "experimental",
+    "caveat": "Experimental. Components: threshold timing, fastball velocity retention, between-game consistency. The formula is not population-calibrated and is not an injury metric."
+  },
+  "model": {
+    "backend": "sklearn_hist_gradient_boosting",
+    "metrics": {
+      "mae": 0.40642789561418546,
+      "mae_ci_lower": 0.3751247460976053,
+      "mae_ci_upper": 0.4364387132699893,
+      "rmse": 0.5118733376132527,
+      "r2": 0.41457399255672467,
+      "naive_mae": 0.5143568660555056,
+      "mae_improvement_pct": 20.983285645432254,
+      "train_games": 12,
+      "test_games": 4,
+      "train_pitches": 1234,
+      "test_pitches": 427,
+      "split_strategy": "chronological",
+      "group_cv_folds": 5,
+      "group_cv_mae_mean": 0.4286620349662537,
+      "group_cv_mae_sd": 0.01420237177421588
+    }
+  },
+  "importance_method": "permutation_mae",
+  "synthetic_warning": "Demonstration only; not an MLB finding."
+}
