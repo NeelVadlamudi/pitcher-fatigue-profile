@@ -1,13 +1,3 @@
----
-title: Pitcher Fatigue Profile
-emoji: ⚾
-colorFrom: red
-colorTo: blue
-sdk: docker
-app_port: 7860
-pinned: false
----
-
 <div align="center">
 
 # Pitcher Fatigue Profile
@@ -32,11 +22,7 @@ within-start velocity and pitch-quality changes.
   <a href="#run-it-locally">Run it</a>
 </p>
 
-<img
-  src="outputs/figures/synthetic_demo_summary.png"
-  alt="Pitcher Fatigue Profile summary showing a fastball velocity decay curve, pitch-type slopes, threshold, season metrics, and uncertainty intervals"
-  width="100%"
->
+<img src="outputs/figures/synthetic_demo_summary.png" alt="Pitcher Fatigue Profile summary showing a fastball velocity decay curve, pitch-type slopes, threshold, season metrics, and uncertainty intervals" width="100%">
 
 </div>
 
