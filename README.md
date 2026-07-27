@@ -1,210 +1,233 @@
----
-title: Pitcher Fatigue Profile
-emoji: ⚾
-colorFrom: red
-colorTo: blue
-sdk: docker
-app_port: 7860
-pinned: false
----
+<div align="center">
 
 # Pitcher Fatigue Profile
 
-Historical Statcast analysis of how a starting pitcher's velocity and pitch
-quality change within a game.
+**Find where a starter's stuff begins to fade—and whether the evidence is strong enough to trust.**
 
-Built by **Neel Vadlamudi** as an auditable baseball analytics case study.
+A game-aware Statcast analysis and Streamlit dashboard for studying<br>
+within-start velocity and pitch-quality changes.
 
-![Pitcher Fatigue Profile summary](outputs/figures/synthetic_demo_summary.png)
+<p><a href="https://github.com/NeelVadlamudi/pitcher-fatigue-profile/actions/workflows/ci.yml"><img alt="Continuous integration status" src="https://github.com/NeelVadlamudi/pitcher-fatigue-profile/actions/workflows/ci.yml/badge.svg"></a> <img alt="Python 3.11" src="https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white"> <img alt="Streamlit application" src="https://img.shields.io/badge/Streamlit-app-FF4B4B?logo=streamlit&logoColor=white"></p>
 
-> This is a postgame decision-support tool. It does not predict injury, measure
-> physiological fatigue directly, or tell a coach when to remove a pitcher.
+<p>
+  <a href="#the-30-second-read">The idea</a> ·
+  <a href="#real-season-proof-logan-webb-2024">Real-season proof</a> ·
+  <a href="#from-raw-pitches-to-a-decision-ready-profile">How it works</a> ·
+  <a href="#run-it-locally">Run it</a>
+</p>
 
-## The question
+<img src="outputs/figures/synthetic_demo_summary.png" alt="Pitcher Fatigue Profile summary showing a fastball velocity decay curve, pitch-type slopes, threshold, season metrics, and uncertainty intervals" width="100%">
 
-A late-game velocity drop can look obvious while still being statistically
-fragile. High-pitch-count outings are a selected group, different pitch types
-operate at different velocity bands, and a pitch-level train/test split can put
-the same game on both sides of model evaluation.
+</div>
 
-I built this project to answer a narrower question:
+> **Built for postgame analysis.** This project does not diagnose physiological
+> fatigue, predict injury, or make an automatic pitching-change decision.
 
-**At what pitch-count range does a starter show a sustained, coverage-qualified
-decline relative to his own early-game baseline?**
+## The 30-second read
 
-The dashboard shows the evidence behind the answer: game coverage, uncertainty,
-pitch-type slopes, data quality, and held-out model performance.
+Most fatigue charts begin and end with a line that slopes downward. That is the
+easy part.
 
-## Case study: Logan Webb, 2024
+The hard part is knowing whether the line reflects a real within-start change
+or a mix of different pitch types, a handful of long outings, repeated pitches
+from the same game, or survivor bias among pitchers who were allowed to stay in.
 
-The full pipeline was run on Logan Webb's 2024 regular-season Statcast data.
+Pitcher Fatigue Profile asks one disciplined question:
 
-| Result | Observed value |
-|---|---:|
-| Eligible starts | 33 |
-| Supported 1 mph threshold | Not established |
-| Fastball delta, pitches 71–80 | −0.902 mph |
-| Fastball delta, pitches 81–90 | −0.882 mph |
-| Chronological holdout MAE | 0.752 mph |
-| Chronological holdout R² | 0.020 |
-| Experimental ASI | 83.0 / 100 |
+> **At what pitch-count range does a starter show a sustained,
+> coverage-qualified decline from his own early-game, same-pitch-type
+> baseline?**
 
-The useful finding is the absence of a clean breaking point. Webb's fastball
-velocity was roughly 0.9 mph below his same-type early baseline late in games,
-but no pitch-count window met every threshold rule. The low holdout R² also
-shows that the available pre-pitch context explains little of the variation in
-an individual pitch.
+The result is a reviewable pitcher profile—not a black-box score. Every finding
+ships with game coverage, uncertainty, held-out performance, and the data checks
+needed to challenge it.
 
-See the [validation record](outputs/validation/logan_webb_2024_validation.json),
-[summary sheet](outputs/validation/logan_webb_2024_summary.png), and
-[full validation notes](docs/validation_report.md).
+## Real-season proof: Logan Webb, 2024
 
-## What the app includes
+The complete pipeline was run on Logan Webb's 2024 regular-season Statcast
+record.
 
-- An equal-game-weighted fastball decay curve with clustered uncertainty
-- A sustained 1 mph threshold with explicit coverage requirements
-- Pitch-type velocity slopes with game-level bootstrap intervals
-- Spin, movement, and velocity retention views
-- Chronological held-out-game model evaluation
-- Associative feature importance with a clear non-causal label
-- Field-level coverage checks and late-game missingness warnings
-- Web PNG, print PNG, and feature-level CSV exports
+<table>
+  <tr>
+    <td align="center" width="25%">
+      <strong>33</strong><br>
+      <sub>eligible starts</sub>
+    </td>
+    <td align="center" width="25%">
+      <strong>Not established</strong><br>
+      <sub>supported 1 mph threshold</sub>
+    </td>
+    <td align="center" width="25%">
+      <strong>0.75 mph</strong><br>
+      <sub>held-out MAE</sub>
+    </td>
+    <td align="center" width="25%">
+      <strong>0.02</strong><br>
+      <sub>held-out R²</sub>
+    </td>
+  </tr>
+</table>
 
-The default view uses a deterministic synthetic pitcher, so the complete app
-can be reviewed without a network request.
+The honest result was not a dramatic red flag. Webb's fastball averaged about
+**0.9 mph below its same-game early baseline from pitches 71–90**, but no
+pitch-count window cleared every support rule required to declare a clean
+1 mph breaking point.
 
-## Method choices that matter
+That non-finding matters. It keeps an appealing visual pattern from becoming a
+claim the data cannot support. The held-out model also barely improved on its
+naive baseline, so its individual-pitch predictions should be read as context,
+not certainty.
 
-| Common failure | Implementation here |
+**Inspect the evidence:** [validation record](outputs/validation/logan_webb_2024_validation.json) ·
+[summary sheet](outputs/validation/logan_webb_2024_summary.png) ·
+[validation notes](docs/validation_report.md)
+
+## Built to survive scrutiny
+
+| A tempting shortcut | What this project does instead |
 |---|---|
-| Mixing fastballs and breaking balls in one baseline | Baselines are computed for each `game_pk × pitch_type` |
-| Letting one game appear in both training and testing | Complete games are isolated; the latest games form the main holdout |
-| Allowing long outings to dominate the mean | Pitches are averaged within each game and bucket before games are averaged |
-| Hiding survivor bias in late innings | Every bucket carries contributing-game and start-coverage counts |
-| Calling one noisy crossing a threshold | The decline must persist, meet coverage rules, and have a bootstrap upper bound below zero |
-| Treating feature importance as causation | Importance is explicitly labeled as a model association |
-| Silently dropping unavailable ASI components | The score is unavailable when required velocity coverage is inadequate |
+| Compare every pitch to one blended velocity baseline | Builds baselines for each `game_pk × pitch_type` |
+| Randomly split pitches into training and test sets | Keeps complete games together and holds out the latest games |
+| Let 110-pitch outings overpower shorter starts | Averages within each game and bucket before averaging across games |
+| Treat late-game samples as equally representative | Reports contributing games and start coverage in every bucket |
+| Call the first noisy 1 mph crossing a threshold | Requires persistence, coverage, and a game-cluster bootstrap interval below zero |
+| Present feature importance as a cause of decline | Labels it as model association and uses permutation importance |
 
-The exact estimands and equations are documented in
-[docs/methodology.md](docs/methodology.md).
+These are not cosmetic safeguards. They determine whether the output describes
+the pitcher or the shape of the dataset. The full estimands and equations are in
+the [methodology](docs/methodology.md).
 
-## Run locally
+## From raw pitches to a decision-ready profile
+
+```mermaid
+flowchart LR
+    A["Statcast pitch data"] --> B["Validate starts<br/>and field coverage"]
+    B --> C["Build game × pitch-type<br/>early baselines"]
+    C --> D["Estimate equal-game<br/>decay curves"]
+    D --> E["Test sustained decline<br/>with coverage rules"]
+    C --> F["Hold out complete<br/>future games"]
+    E --> G["Pitcher profile"]
+    F --> G
+```
+
+The dashboard brings the analytical trail into one view:
+
+- fastball velocity delta by game pitch count, with game-cluster uncertainty;
+- velocity slope by pitch type;
+- spin, movement, extension, and velocity-retention views;
+- start coverage and late-game selection warnings;
+- chronological held-out-game evaluation; and
+- web PNG, print PNG, and feature-level CSV exports.
+
+It opens with a deterministic synthetic pitcher, so the full experience can be
+reviewed without an internet request. Live Statcast retrieval is available from
+the sidebar.
+
+## Run it locally
 
 Python 3.11 is the supported runtime.
 
 ```bash
+git clone https://github.com/NeelVadlamudi/pitcher-fatigue-profile.git
+cd pitcher-fatigue-profile
 python3.11 -m venv .venv
 source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements-dev.txt
+python -m pip install -r requirements.txt
 python -m pip install -e .
 streamlit run app/streamlit_app.py
 ```
 
-Choose **Live Statcast** in the sidebar to retrieve a pitcher-season. The
-downloaded CSV is cached under `data/raw/` and excluded from version control.
+The app launches with bundled demonstration data. Select **Live Statcast** to
+retrieve a pitcher-season; downloaded files are cached under `data/raw/` and
+remain outside version control.
 
-## Reproduce the analysis
-
-Run the automated checks:
+## Reproduce the evidence
 
 ```bash
+# Run the automated checks
 python -m pytest -q
-```
 
-Execute both notebooks from top to bottom:
-
-```bash
+# Rebuild and execute both analysis notebooks
 python scripts/build_notebooks.py
 python -m nbconvert --execute --to notebook --inplace \
   notebooks/01_data_quality_and_features.ipynb \
   notebooks/02_model_validation.ipynb \
   --ExecutePreprocessor.timeout=300
-```
 
-Build a real-player validation record and summary:
-
-```bash
+# Rebuild the real-player validation record
 python scripts/validate_real_pitcher.py Logan Webb 2024
 ```
 
-The committed release has 23 passing tests, 75% branch-aware package coverage,
-two fully executed notebooks, and exception-free dashboard checks for both the
-synthetic sample and the cached Logan Webb season.
+The published release contains **23 passing tests**, **75% branch-aware package
+coverage**, two fully executed notebooks, and exception-free dashboard checks
+for the synthetic sample and cached Logan Webb season.
 
-## Repository map
+### Review paths
+
+| If you want to review… | Start here |
+|---|---|
+| Statistical definitions and equations | [Methodology](docs/methodology.md) |
+| Real-player checks and observed results | [Validation report](docs/validation_report.md) |
+| Intended use and model risk | [Model card](docs/model_card.md) |
+| What each chart must communicate | [Chart contracts](docs/chart_contracts.md) |
+| Release-readiness checks | [Pre-deployment review](docs/predeploy_review.md) |
+| Executed exploratory work | [Data notebook](notebooks/01_data_quality_and_features.ipynb) and [model notebook](notebooks/02_model_validation.ipynb) |
+
+<details>
+<summary><strong>Repository anatomy</strong></summary>
 
 ```text
 .
 ├── app/                    Streamlit interface
 ├── data/sample/            Deterministic offline demonstration
-├── docs/                   Methodology, validation, and chart contracts
+├── docs/                   Methods, validation, and chart contracts
 ├── notebooks/              Executed analysis walkthroughs
 ├── outputs/                Shareable figures and validation records
 ├── scripts/                Reproduction and export commands
-├── src/pitcher_fatigue/    Analysis package
+├── src/pitcher_fatigue/    Tested analysis package
 ├── tests/                  Unit and integration checks
 ├── Dockerfile              Hugging Face Docker Space runtime
 └── pyproject.toml          Package and test configuration
 ```
 
-## Documentation
+</details>
 
-- [Methodology](docs/methodology.md)
-- [Validation report](docs/validation_report.md)
-- [Model card](docs/model_card.md)
-- [Chart contracts](docs/chart_contracts.md)
-- [Pre-deployment review](docs/predeploy_review.md)
-- [GitHub publishing checklist](docs/github_publishing.md)
+<details>
+<summary><strong>Modeling boundary and known limitations</strong></summary>
 
-## Modeling boundary
-
-The primary model predicts velocity delta from information available before a
+The primary model predicts velocity delta using information available before a
 pitch and evaluates on the latest complete games. A separate descriptive model
-may use spin, extension, and movement measured on the same pitch to explain
-associations. That second model is not a real-time forecast.
+can use same-pitch measurements such as spin, extension, and movement to explain
+associations; it is not a real-time forecast.
 
-The Arm Stamina Index is an experimental summary of threshold timing,
-late-fastball retention, and between-game consistency. It is transparent but
-not population-calibrated, and it has no injury-risk interpretation.
+The experimental Arm Stamina Index summarizes threshold timing, late-fastball
+retention, and between-game consistency. It is transparent but not
+population-calibrated and has no injury-risk interpretation.
 
-## Deployment
-
-The repository is ready for a Hugging Face Docker Space. The `Dockerfile`
-installs the required Linux runtime and starts Streamlit on port 7860.
-
-1. Create a Space with the **Docker** SDK.
-2. Push this repository to the Space.
-3. Keep `sdk: docker` and `app_port: 7860` in the README metadata.
-4. Treat live Baseball Savant access as optional; the bundled sample provides a
-   reliable first view.
-
-## Limitations
-
-- The estimates are historical associations, not direct physiological measures.
-- The early baseline uses the first 25 game pitches and is not known pregame.
+- Early baselines use the first 25 game pitches and are not known pregame.
 - Statcast pitch labels and historical records can be revised.
-- Warm-up pitches and other workload outside Statcast are not observed.
-- Pitchers who reach high counts are selected, even when coverage is reported.
-- Weather, health status, between-game workload, opponent, catcher, and intent
+- Warm-up pitches and other workload outside Statcast are unobserved.
+- Pitchers who reach high counts remain a selected group, even when coverage is
+  reported.
+- Health status, between-game workload, weather, opponent, catcher, and intent
   are incomplete or absent.
 - A single season can still be too small for some pitch types.
 
-## Data and credits
+</details>
+
+## Evidence base and credits
 
 Pitch-level data come from
 [Baseball Savant](https://baseballsavant.mlb.com) through
 [pybaseball](https://github.com/jldbc/pybaseball). Field definitions follow the
 official [Statcast CSV documentation](https://baseballsavant.mlb.com/csv-docs).
 
-The pitch palette is adapted from Thomas Nestico's
-[pitching_summary](https://github.com/tnestico/pitching_summary). Red Sox colors
-are used only as interface accents; pitch identity keeps its own established
-color mapping.
-
-Workload context includes Bradbury and Forman's 2012 study,
-[PMID 22344048](https://pubmed.ncbi.nlm.nih.gov/22344048/), and a
+The project was scoped as historical decision support after reviewing published
+work on pitcher workload and fatigue, including
+[Bradbury and Forman (2012)](https://pubmed.ncbi.nlm.nih.gov/22344048/) and a
 [systematic review of pitcher fatigue](https://pmc.ncbi.nlm.nih.gov/articles/PMC6673423/).
+The pitch palette is adapted from Thomas Nestico's
+[pitching_summary](https://github.com/tnestico/pitching_summary).
 
-This independent portfolio project is not affiliated with MLB, the Boston Red
-Sox, Baseball Savant, or the cited visualization authors.
+Built by **Neel Vadlamudi**. This independent portfolio project is not
+affiliated with MLB, the Boston Red Sox, Baseball Savant, or the cited authors.
